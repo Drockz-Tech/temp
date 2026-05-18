@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PlaceReady — Verified Student Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --blue-50: #eff6ff; --blue-100: #dbeafe; --blue-200: #bfdbfe;
+  --blue-400: #60a5fa; --blue-500: #3b82f6; --blue-600: #2563eb; --blue-700: #1d4ed8;
+  --dark: #0a0a0f; --dark-2: #111118; --dark-3: #1a1a25; --dark-4: #252535;
+  --gray-400: #9ca3af; --gray-500: #6b7280; --gray-600: #4b5563;
+  --white: #ffffff; --green: #22c55e; --orange: #f59e0b; --purple: #8b5cf6; --cyan: #06b6d4; --red: #ef4444;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--dark);
+  color: var(--white);
+  min-height: 100vh;
+  padding: 32px 16px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* ── Typography ── */
+.display-xl { font-family: 'Space Grotesk', sans-serif; font-size: clamp(32px, 4vw, 48px); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; }
+.display-lg { font-family: 'Space Grotesk', sans-serif; font-size: clamp(24px, 3vw, 36px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; }
+.display-md { font-family: 'Space Grotesk', sans-serif; font-size: clamp(18px, 2vw, 24px); font-weight: 600; line-height: 1.2; }
+.text-lg { font-size: 18px; line-height: 1.6; }
+.text-md { font-size: 15px; line-height: 1.6; }
+.text-sm { font-size: 13px; line-height: 1.5; }
+
+.gradient-text { background: linear-gradient(135deg, var(--blue-400), var(--cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+/* ── Components ── */
+.glass-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.glass-card:hover { border-color: rgba(255,255,255,0.12); }
+
+.label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--blue-400); margin-bottom: 12px; }
+.sub-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-500); margin-bottom: 8px; }
+
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+/* ── Progress Bars ── */
+.mini-bar { height: 8px; border-radius: 4px; background: var(--dark-4); overflow: hidden; }
+.mini-bar-fill { height: 100%; border-radius: 4px; transition: width 1.5s ease; }
+
+.large-bar { height: 12px; border-radius: 6px; background: var(--dark-4); overflow: hidden; }
+.large-bar-fill { height: 100%; border-radius: 6px; transition: width 1.5s ease; }
+
+/* ── Circular Score ── */
+.circle-score {
+  width: 140px; height: 140px; border-radius: 50%; position: relative;
+  display: flex; align-items: center; justify-content: center;
+  background: conic-gradient(var(--blue-500) 0% 87%, var(--dark-4) 87% 100%);
+}
+.circle-score-inner {
+  width: 115px; height: 115px; border-radius: 50%; background: var(--dark-2);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+
+/* ── Tables ── */
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { padding: 12px 16px; text-align: left; font-weight: 600; color: var(--gray-500); border-bottom: 1px solid rgba(255,255,255,0.08); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; }
+.data-table td { padding: 14px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.data-table tr:last-child td { border-bottom: none; }
+
+/* ── Badges ── */
+.feature-badge {
+  display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; font-size: 13px; font-weight: 500;
+}
+.badge-gold { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.2); color: var(--orange); box-shadow: 0 0 15px rgba(245,158,11,0.05); }
+.badge-purple { background: rgba(139,92,246,0.1); border: 1px solid rgba(139,92,246,0.2); color: var(--purple); }
+.badge-blue { background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: var(--blue-400); }
+.badge-green { background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2); color: var(--green); }
+
+/* ── AI Summary ── */
+.ai-summary-box {
+  position: relative; background: rgba(59,130,246,0.05); border-radius: 16px; padding: 28px;
+  border: 1px solid rgba(59,130,246,0.15);
+}
+.ai-summary-box::before {
+  content: ''; position: absolute; inset: -1px; border-radius: 16px; padding: 1px;
+  background: linear-gradient(135deg, var(--blue-600), var(--cyan), var(--purple));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor; mask-composite: exclude; opacity: 0.5;
+}
+
+/* ── BG Decors ── */
+.bg-glow { position: fixed; border-radius: 50%; filter: blur(100px); pointer-events: none; z-index: 0; }
+.bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px); background-size: 60px 60px; pointer-events: none; z-index: 0; }
+
+/* ── Header Buttons ── */
+.btn-primary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: linear-gradient(135deg, var(--blue-600), var(--blue-700)); border: none; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--white); cursor: pointer; transition: all 0.3s; }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(37,99,235,0.3); }
+.btn-secondary { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--white); cursor: pointer; transition: all 0.3s; }
+.btn-secondary:hover { background: rgba(255,255,255,0.08); }
+
+/* ── Responsive ── */
+@media (max-width: 1024px) { .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .grid-2 { grid-template-columns: 1fr; } .header-flex { flex-direction: column; text-align: center; } .circle-score { margin: 0 auto; } }
+</style>
+</head>
+<body>
+
+<div class="bg-glow" style="width:600px;height:600px;background:var(--blue-600);top:-200px;right:-100px;opacity:0.08;"></div>
+<div class="bg-glow" style="width:500px;height:500px;background:var(--purple);bottom:-200px;left:-100px;opacity:0.06;"></div>
+<div class="bg-grid"></div>
+
+<div class="container">
+
+  <!-- ── HEADER ── -->
+  <div class="glass-card" style="margin-bottom:24px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;margin-bottom:24px;" class="header-flex">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,var(--blue-600),var(--cyan));display:flex;align-items:center;justify-content:center;">
+          <i data-lucide="shield-check" style="width:20px;height:20px;color:#fff;"></i>
+        </div>
+        <div>
+          <div style="font-weight:700;font-size:16px;">PlaceReady Verified Report</div>
+          <div style="font-size:11px;color:var(--gray-500);">ID: PR-2025-8473 · Generated: May 12, 2025</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-secondary"><i data-lucide="share-2" style="width:16px;height:16px;"></i> Share</button>
+        <button class="btn-primary"><i data-lucide="download" style="width:16px;height:16px;"></i> PDF</button>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:32px;align-items:center;flex-wrap:wrap;" class="header-flex">
+      <div class="circle-score">
+        <div class="circle-score-inner">
+          <div style="font-family:'Space Grotesk';font-size:36px;font-weight:700;color:var(--blue-400);">87</div>
+          <div style="font-size:10px;color:var(--gray-500);font-weight:600;">/ 100</div>
+        </div>
+      </div>
+      
+      <div style="flex:1;">
+        <h1 class="display-lg" style="margin-bottom:4px;">Arjun Sharma</h1>
+        <p style="color:var(--gray-400);margin-bottom:16px;">B.Tech in Computer Science · Darshan University</p>
+        
+        <div style="display:flex;gap:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;">
+            <i data-lucide="briefcase" style="width:14px;height:14px;color:var(--blue-400);"></i>
+            <span class="text-sm" style="color:var(--gray-400);">Target: SDE-1</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <i data-lucide="calendar" style="width:14px;height:14px;color:var(--blue-400);"></i>
+            <span class="text-sm" style="color:var(--gray-400);">Batch: 2021–2025</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <i data-lucide="trophy" style="width:14px;height:14px;color:var(--orange);"></i>
+            <span class="text-sm" style="color:var(--orange);font-weight:600;">Top 8% Nationally</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 4-YEAR PROGRESSION ── -->
+  <div style="margin-bottom:24px;">
+    <div class="label">4-Year Skill Progression Engine</div>
+    <div class="glass-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+        <div style="font-weight:600;">Custom Learning Path: Full-Stack Development & System Design</div>
+      </div>
+      
+      <div class="grid-4" style="gap:16px;">
+        <div style="background:var(--dark-3);padding:20px;border-radius:12px;border-left:3px solid var(--gray-500);">
+          <div style="font-size:11px;font-weight:600;color:var(--gray-500);margin-bottom:8px;">YEAR 1</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Foundation Build</div>
+          <div style="font-size:24px;font-weight:700;color:var(--gray-400);margin-bottom:8px;">62<span style="font-size:12px;color:var(--gray-600);">/100</span></div>
+          <div class="large-bar"><div class="large-bar-fill" style="width:62%;background:var(--gray-500);"></div></div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:6px;">✅ Completed</div>
+        </div>
+        
+        <div style="background:var(--dark-3);padding:20px;border-radius:12px;border-left:3px solid var(--blue-500);">
+          <div style="font-size:11px;font-weight:600;color:var(--blue-400);margin-bottom:8px;">YEAR 2</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Core Skill Dev</div>
+          <div style="font-size:24px;font-weight:700;color:var(--blue-400);margin-bottom:8px;">74<span style="font-size:12px;color:var(--gray-600);">/100</span></div>
+          <div class="large-bar"><div class="large-bar-fill" style="width:74%;background:var(--blue-500);"></div></div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:6px;">✅ Completed</div>
+        </div>
+        
+        <div style="background:var(--dark-3);padding:20px;border-radius:12px;border-left:3px solid var(--purple);">
+          <div style="font-size:11px;font-weight:600;color:var(--purple);margin-bottom:8px;">YEAR 3</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Specialization & DSA</div>
+          <div style="font-size:24px;font-weight:700;color:var(--purple);margin-bottom:8px;">85<span style="font-size:12px;color:var(--gray-600);">/100</span></div>
+          <div class="large-bar"><div class="large-bar-fill" style="width:85%;background:var(--purple);"></div></div>
+          <div style="font-size:10px;color:var(--gray-500);margin-top:6px;">✅ Completed</div>
+        </div>
+        
+        <div style="background:var(--dark-3);padding:20px;border-radius:12px;border-left:3px solid var(--cyan);position:relative;overflow:hidden;">
+          <div style="position:absolute;top:0;right:0;background:var(--cyan);color:var(--dark);font-size:9px;font-weight:700;padding:4px 8px;border-radius:0 12px 0 8px;">CURRENT</div>
+          <div style="font-size:11px;font-weight:600;color:var(--cyan);margin-bottom:8px;">YEAR 4</div>
+          <div style="font-size:14px;font-weight:600;margin-bottom:4px;">Placement Readiness</div>
+          <div style="font-size:24px;font-weight:700;color:var(--cyan);margin-bottom:8px;">92<span style="font-size:12px;color:var(--gray-600);">/100</span></div>
+          <div class="large-bar"><div class="large-bar-fill" style="width:92%;background:linear-gradient(90deg,var(--cyan),var(--blue-500));"></div></div>
+          <div style="font-size:10px;color:var(--orange);margin-top:6px;">🟡 In Progress</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── THEORETICAL + PRACTICAL ── -->
+  <div class="grid-2" style="margin-bottom:24px;">
+    <!-- Theoretical -->
+    <div>
+      <div class="label">Theoretical Assessments</div>
+      <div class="glass-card">
+        <div style="display:flex;flex-direction:column;gap:18px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span class="text-sm" style="font-weight:500;">Quantitative Aptitude</span>
+              <span class="text-sm" style="color:var(--blue-400);font-weight:600;">88% <span style="color:var(--gray-500);font-weight:400;">· 91st %ile</span></span>
+            </div>
+            <div class="large-bar"><div class="large-bar-fill" style="width:88%;background:linear-gradient(90deg,var(--blue-600),var(--blue-400));"></div></div>
+          </div>
+          
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span class="text-sm" style="font-weight:500;">Logical Reasoning</span>
+              <span class="text-sm" style="color:var(--blue-400);font-weight:600;">85% <span style="color:var(--gray-500);font-weight:400;">· 88th %ile</span></span>
+            </div>
+            <div class="large-bar"><div class="large-bar-fill" style="width:85%;background:linear-gradient(90deg,var(--blue-600),var(--blue-400));"></div></div>
+          </div>
+          
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span class="text-sm" style="font-weight:500;">OOP & DBMS</span>
+              <span class="text-sm" style="color:var(--green);font-weight:600;">92% <span style="color:var(--gray-500);font-weight:400;">· 94th %ile</span></span>
+            </div>
+            <div class="large-bar"><div class="large-bar-fill" style="width:92%;background:linear-gradient(90deg,var(--green),#4ade80);"></div></div>
+          </div>
+          
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span class="text-sm" style="font-weight:500;">OS & Computer Networks</span>
+              <span class="text-sm" style="color:var(--orange);font-weight:600;">78% <span style="color:var(--gray-500);font-weight:400;">· 72nd %ile</span></span>
+            </div>
+            <div class="large-bar"><div class="large-bar-fill" style="width:78%;background:linear-gradient(90deg,var(--orange),#fbbf24);"></div></div>
+          </div>
+          
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+              <span class="text-sm" style="font-weight:500;">Verbal Ability</span>
+              <span class="text-sm" style="color:var(--blue-400);font-weight:600;">81% <span style="color:var(--gray-500);font-weight:400;">· 80th %ile</span></span>
+            </div>
+            <div class="large-bar"><div class="large-bar-fill" style="width:81%;background:linear-gradient(90deg,var(--blue-600),var(--blue-400));"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Practical -->
+    <div>
+      <div class="label">Practical Skill Tests</div>
+      <div class="glass-card" style="display:flex;flex-direction:column;gap:20px;">
+        <!-- Coding -->
+        <div style="background:var(--dark-3);border-radius:12px;padding:16px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <i data-lucide="code" style="width:16px;height:16px;color:var(--cyan);"></i>
+            <span style="font-weight:600;font-size:14px;">Coding & DSA Profile</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+            <div style="background:var(--dark-2);padding:10px;border-radius:8px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:var(--cyan);">412</div>
+              <div style="font-size:10px;color:var(--gray-500);">Problems Solved</div>
+            </div>
+            <div style="background:var(--dark-2);padding:10px;border-radius:8px;text-align:center;">
+              <div style="font-size:22px;font-weight:700;color:var(--green);">84.5%</div>
+              <div style="font-size:10px;color:var(--gray-500);">Accuracy</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <span style="font-size:10px;padding:4px 8px;background:rgba(34,197,94,0.1);color:var(--green);border-radius:6px;">Easy: 180</span>
+            <span style="font-size:10px;padding:4px 8px;background:rgba(59,130,246,0.1);color:var(--blue-400);border-radius:6px;">Medium: 190</span>
+            <span style="font-size:10px;padding:4px 8px;background:rgba(239,68,68,0.1);color:var(--red);border-radius:6px;">Hard: 42</span>
+          </div>
+        </div>
+
+        <!-- Projects -->
+        <div style="background:var(--dark-3);border-radius:12px;padding:16px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+            <i data-lucide="folder-git-2" style="width:16px;height:16px;color:var(--purple);"></i>
+            <span style="font-weight:600;font-size:14px;">Project & Build Score</span>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
+            <div style="background:var(--dark-2);padding:10px;border-radius:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:700;color:var(--purple);">4</div>
+              <div style="font-size:9px;color:var(--gray-500);">Projects</div>
+            </div>
+            <div style="background:var(--dark-2);padding:10px;border-radius:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:700;color:var(--green);">88</div>
+              <div style="font-size:9px;color:var(--gray-500);">Code Quality</div>
+            </div>
+            <div style="background:var(--dark-2);padding:10px;border-radius:8px;text-align:center;">
+              <div style="font-size:18px;font-weight:700;color:var(--orange);">14mo</div>
+              <div style="font-size:9px;color:var(--gray-500);">Git Streak</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comms -->
+        <div style="background:var(--dark-3);border-radius:12px;padding:16px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <i data-lucide="mic" style="width:16px;height:16px;color:var(--orange);"></i>
+            <span style="font-weight:600;font-size:14px;">Communication Skills</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="text-sm" style="color:var(--gray-400);">AI Speech Analysis</span>
+            <span style="font-weight:700;color:var(--orange);">8.5 / 10</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── PLACEMENT READINESS ── -->
+  <div style="margin-bottom:24px;">
+    <div class="label">Placement Readiness Index</div>
+    <div class="grid-2">
+      <!-- Mock Interviews -->
+      <div class="glass-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+          <i data-lucide="message-square" style="width:18px;height:18px;color:var(--purple);"></i>
+          <h3 style="font-weight:600;font-size:16px;">AI Mock Interviews</h3>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Type</th>
+              <th>Sessions</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:500;">Technical (DSA)</td>
+              <td>8</td>
+              <td><span style="color:var(--green);font-weight:600;">8.2/10</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:500;">Technical (Sys Design)</td>
+              <td>5</td>
+              <td><span style="color:var(--blue-400);font-weight:600;">7.8/10</span></td>
+            </tr>
+            <tr>
+              <td style="font-weight:500;">HR / Behavioral</td>
+              <td>6</td>
+              <td><span style="color:var(--cyan);font-weight:600;">9.0/10</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- OA Simulations -->
+      <div class="glass-card">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:20px;">
+          <i data-lucide="monitor-play" style="width:18px;height:18px;color:var(--cyan);"></i>
+          <h3 style="font-weight:600;font-size:16px;">OA Simulations</h3>
+        </div>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Clear Rate</th>
+              <th>Avg Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style="font-weight:500;">TCS NQT / Xplore</td>
+              <td><span style="color:var(--green);">100%</span></td>
+              <td>42/60 min</td>
+            </tr>
+            <tr>
+              <td style="font-weight:500;">Infosys SP / DSE</td>
+              <td><span style="color:var(--orange);">75%</span></td>
+              <td>55/60 min</td>
+            </tr>
+            <tr>
+              <td style="font-weight:500;">Wipro Turbo</td>
+              <td><span style="color:var(--green);">100%</span></td>
+              <td>38/60 min</td>
+            </tr>
+            <tr>
+              <td style="font-weight:500;">Amazon SDE</td>
+              <td><span style="color:var(--red);">50%</span></td>
+              <td>65/90 min</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── RESUME SCORE ── -->
+  <div style="margin-bottom:24px;">
+    <div class="label">AI Resume Analysis</div>
+    <div class="glass-card">
+      <div class="grid-2" style="align-items:center;">
+        <div>
+          <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+            <div style="width:64px;height:64px;border-radius:50%;background:conic-gradient(var(--green) 0% 91%, var(--dark-4) 91% 100%);display:flex;align-items:center;justify-content:center;">
+              <div style="width:50px;height:50px;border-radius:50%;background:var(--dark-2);display:flex;align-items:center;justify-content:center;">
+                <span style="font-size:18px;font-weight:700;color:var(--green);">91</span>
+              </div>
+            </div>
+            <div>
+              <div style="font-weight:700;font-size:18px;">Resume Score</div>
+              <div style="font-size:12px;color:var(--green);font-weight:500;">✓ ATS Compatible (98%)</div>
+            </div>
+          </div>
+          
+          <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span class="text-sm">Action Verbs</span>
+                <span class="text-sm" style="color:var(--green);">High</span>
+              </div>
+              <div class="mini-bar"><div class="mini-bar-fill" style="width:90%;background:var(--green);"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span class="text-sm">Impact Quantification</span>
+                <span class="text-sm" style="color:var(--orange);">Moderate</span>
+              </div>
+              <div class="mini-bar"><div class="mini-bar-fill" style="width:65%;background:var(--orange);"></div></div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+                <span class="text-sm">Formatting</span>
+                <span class="text-sm" style="color:var(--green);">Professional</span>
+              </div>
+              <div class="mini-bar"><div class="mini-bar-fill" style="width:95%;background:var(--green);"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.15);border-radius:12px;padding:16px;display:flex;gap:12px;align-items:start;">
+          <i data-lucide="lightbulb" style="width:20px;height:20px;color:var(--orange);flex-shrink:0;margin-top:2px;"></i>
+          <div>
+            <div style="font-weight:600;font-size:13px;color:var(--orange);margin-bottom:4px;">AI Suggestion</div>
+            <div style="font-size:12px;color:var(--gray-400);line-height:1.5;">Add measurable outcomes to 2 project bullet points. E.g., "Reduced load time by 40%" instead of "Optimized performance".</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BADGES ── -->
+  <div style="margin-bottom:24px;">
+    <div class="label">Verified Badges</div>
+    <div class="glass-card">
+      <p style="font-size:12px;color:var(--gray-500);margin-bottom:16px;">Unlocked through proctored assessments and consistent performance</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div class="feature-badge badge-gold">
+          <i data-lucide="trophy" style="width:16px;height:16px;"></i> Platinum Coder
+        </div>
+        <div class="feature-badge badge-purple">
+          <i data-lucide="brain" style="width:16px;height:16px;"></i> Aptitude Master
+        </div>
+        <div class="feature-badge badge-blue">
+          <i data-lucide="mic" style="width:16px;height:16px;"></i> Communication Pro
+        </div>
+        <div class="feature-badge badge-green">
+          <i data-lucide="zap" style="width:16px;height:16px;"></i> OA Veteran
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── AI COACH SUMMARY ── -->
+  <div style="margin-bottom:32px;">
+    <div class="label">AI Career Coach Summary</div>
+    <div class="ai-summary-box">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--blue-600),var(--cyan));display:flex;align-items:center;justify-content:center;">
+          <i data-lucide="sparkles" style="width:16px;height:16px;color:#fff;"></i>
+        </div>
+        <div>
+          <div style="font-weight:600;font-size:14px;">PlaceReady AI Engine</div>
+          <div style="font-size:10px;color:var(--gray-500);">Personalized Insight</div>
+        </div>
+      </div>
+      
+      <p style="color:var(--gray-300);line-height:1.7;font-size:15px;">
+        Arjun has shown <strong style="color:var(--white);">exceptional consistency</strong> over his 4-year journey, transitioning from a 62 employability score in his 1st year to an 87 today. His aptitude and DSA fundamentals are <strong style="color:var(--green);">rock-solid</strong> (94th percentile in OOP/DBMS). He is <strong style="color:var(--cyan);">highly recommended for Service-Based MNCs</strong> (TCS, Infosys, Cognizant) and is borderline ready for Product-Based MAANG interviews. I recommend focusing the next 3 weeks exclusively on <strong style="color:var(--white);">Advanced Graphs and System Design Databases</strong> to unlock the 'MAANG Ready' badge.
+      </p>
+      
+      <div style="margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="padding:8px 14px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);border-radius:8px;font-size:12px;color:var(--green);font-weight:500;">
+          ✓ Service MNC Ready
+        </div>
+        <div style="padding:8px 14px;background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.2);border-radius:8px;font-size:12px;color:var(--blue-400);font-weight:500;">
+          ~ MAANG Borderline
+        </div>
+        <div style="padding:8px 14px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);border-radius:8px;font-size:12px;color:var(--orange);font-weight:500;">
+          ⚡ Focus: Graphs & DB Design
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <div style="text-align:center;padding:24px 0;border-top:1px solid rgba(255,255,255,0.06);">
+    <p style="font-size:11px;color:var(--gray-600);max-width:600px;margin:0 auto 12px;line-height:1.6;">
+      This report is auto-generated and cryptographically verified by PlaceReady. Scores are based on proctored, cheat-proof assessments.
+    </p>
+    <p style="font-size:11px;color:var(--gray-600);">
+      Verify this report at <span style="color:var(--blue-400);">verify.placeready.io/PR-2025-8473</span> · © 2025 PlaceReady
+    </p>
+  </div>
+
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+
+</body>
+</html>
